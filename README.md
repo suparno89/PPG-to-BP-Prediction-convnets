@@ -1,6 +1,6 @@
 # PPG-to-BP-Prediction-convnets
 
-This repository contains the code for the AIME submission #65
+This repository contains the code for the AIME2020 submission #65
 
 Here we have two approaches to predict BP from Photoplethysmograms (PPG signal)
 

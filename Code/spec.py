@@ -16,14 +16,14 @@ plt.close("all")
 
 
 ##readppg data, change the path according to your own directories
-with open('../intermediate_data/ppg_snippets_kaggle.json', 'r') as JSON:
+with open('../intermediate_data/all_features_30sec_bfill_fullday.json', 'r') as JSON:
     json_dict = json.load(JSON)
 
 
 #############
 #Constants
 #############
-Fs=1000; #sampling frequency
+Fs=64; #sampling frequency
 
 #############
 #independent variables
@@ -32,10 +32,10 @@ detrends = ['mean'];   #none, mean, linear
 
 #number of frequencies in spectrogram #Nfft=pow(2,pot);
 #pots = np.linspace(8,14,dtype="int"); #potence of 2.
-pots = [10, 12]
+pots = [6]
 
 #meas= np.arange(1,np.size((json_dict[:])),10,dtype="int")#
-meas= [115]  #set which measurements to analyse
+meas= [90,91,92,93,94,95]  #set which measurements to analyse ##take the second one
 
 
 for detrend in detrends:
@@ -48,7 +48,7 @@ for detrend in detrends:
             #############
             ##spectograms
             #############
-            fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(15,9));
+            fig, (ax1) = plt.subplots(nrows=1, figsize=(10,8));
             
             Pxx, freqs, bins, im = ax1.specgram(json_dict[meas_i]['ppg'], Fs=Fs, NFFT=Nfft,noverlap=Nfft/2,detrend=detrend,window=np.hanning(Nfft))#,pad_to=Nfft, 
             # The `specgram` method returns 4 objects. They are:
@@ -57,20 +57,25 @@ for detrend in detrends:
             # - bins: the centers of the time bins
             # - im: the matplotlib.image.AxesImage instance representing the data in the plot
             
-            ax2.loglog(freqs,np.transpose([np.min(Pxx,1),np.mean(Pxx,1),np.max(Pxx,1),]))
+            #ax2.loglog(freqs,np.transpose([np.min(Pxx,1),np.mean(Pxx,1),np.max(Pxx,1),]))
             
             print("# = ", meas_i,"Nfft = ", Nfft, ", Nt = ", np.size(Pxx[1,:]) )
             #set 
-            fig.suptitle('meas #'+str(meas_i)+', Nfft = '+str(Nfft)+', Nt = '+ str(np.size(Pxx[1,:]))+'__detrend_'+ detrend)
-            ax1.set_title("Spectrogram")
-            ax1.set_yscale("log");
-            ax1.set_xlabel("t in s")
-            ax1.set_ylabel("f in Hz");
+            #fig.suptitle('meas #'+str(meas_i)+', Nfft = '+str(Nfft)+', Nt = '+ str(np.size(Pxx[1,:]))+'__detrend_'+ detrend)
+            yticks = 2**np.arange(-2, np.floor(np.log2(freqs.max())))
+            ax1.set_yticks(np.log2(yticks))
+            ax1.set_yticklabels(yticks)
+            ax1.set_title("Spectrogram of Signal", fontsize = 20)
+            ax1.set_yscale("log")
+            ax1.set_xlabel("Time (sec)", fontsize = 18)
+            ax1.set_ylabel("Frequencies (Hz)", fontsize = 18)
             ax1.set_ylim(freqs[1], freqs[-1])
-            ax2.set_title("double log magnitude plot")
-            ax2.set_xlabel("frequency [Hz]")
-            ax2.set_ylabel("Magnitude [unit?]");
-            ax2.legend(["min","mean of "+str(np.size(Pxx[1,:])),"max"])
+            cbar_ax = fig.add_axes([0.9, 0.5, 0.03, 0.25])
+            fig.colorbar(im, cax=cbar_ax, orientation="vertical")
+            #ax2.set_title("double log magnitude plot")
+            #ax2.set_xlabel("frequency [Hz]")
+            #ax2.set_ylabel("Magnitude [unit?]");
+            #ax2.legend(["min","mean of "+str(np.size(Pxx[1,:])),"max"])
             plt.show()
             
             #plt.savefig('fig_out/spectrogram__meas_'+str(meas_i)+'__Nfft_'+str(Nfft)+'__detrend_'+ detrend)

@@ -18,12 +18,13 @@ plt.close("all")
 
 def plot_wavelet(time, signals, scales, 
                  waveletname, 
-                 title = 'Wavelet Transform (Power Spectrum) of signal', 
+                 title = 'Wavelet Transform of signal', 
                  ylabel = 'Frequencies (Hz)', 
-                 xlabel = 'Time sec'):
-    #fig, (ax,ax2) = plt.subplots(nrows=2,figsize=(10, 8),sharex=True)
+                 xlabel = 'Time (sec)'):
+    
     for v in signals:
 
+        fig, (ax) = plt.subplots(nrows=1,figsize=(10, 8),sharex=True)
         signal1 = v['ppg']
         print(len(signal1))
         
@@ -42,57 +43,76 @@ def plot_wavelet(time, signals, scales,
         lev_exp = np.arange(-5, np.ceil(np.log10(power.max())+1))
         levs = np.power(10, lev_exp)
         ##for cardioveg
-     
+
+        print(time.shape)
+        print(frequencies.shape)
+        print(power[:,1:].shape)
         im = ax.contourf(time, np.log2(frequencies[:]), power[:,1:], levs, norm=mpl.colors.LogNorm(), extend='both',cmap="RdBu_r")
     
-        #im = ax.contourf(time,  np.log2(frequencies[:]), np.log2(power[:,1:]), contourlevels, extend='both')
-        #ax.set_title(title, fontsize=20)
-        #ax.set_ylabel(ylabel, fontsize=18)
-        #ax.set_xlabel(xlabel, fontsize=18)
+        #im = ax.contourf(time, np.log2(frequencies[1:]), power[:][1:], levs, norm=mpl.colors.LogNorm(), extend='both',cmap="RdBu_r")
+        ax.set_title(title, fontsize=20)
+        ax.set_ylabel(ylabel, fontsize=18)
+        ax.set_xlabel(xlabel, fontsize=18)
         
-        yticks = 2**np.arange(-2, np.floor(np.log2(frequencies.max())))
+        yticks = 2**np.arange(-1, np.floor(np.log2(frequencies.max())))
+        print(yticks)
         ax.set_yticks(np.log2(yticks))
         ax.set_yticklabels(yticks)
         ax.invert_yaxis()
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        #ax.get_xaxis().set_visible(False)
+        #ax.get_yaxis().set_visible(False)
         ylim = ax.get_ylim()
-        print(ylim[0])
-        ax.set_ylim(ylim[0], 0)
+        print(ylim)
+        #ax.set_ylim(ylim[0], -1)
+        ax.set_ylim(ylim[0], 1)
+        #ax.set_ylim(0, ylim[1])
         
-        
-        #cbar_ax = fig.add_axes([0.9, 0.5, 0.03, 0.25])
-        #fig.colorbar(im, cax=cbar_ax, orientation="vertical")
+        cbar_ax = fig.add_axes([0.9, 0.5, 0.03, 0.25])
+        fig.colorbar(im, cax=cbar_ax, orientation="vertical")
 
 
-        #ax2.plot(time,signal)
+        #ax2.plot(time, signal1[1:])
         #ax2.plot(time,np.max(power,0))
 
-        #plt.show()
+        plt.show()
 
 # In[12]:
 
 
+def plot_signal(time, signals):
+
+    for v in signals: 
+        #signal1 = Signal.detrend(v['ppg'], type='constant')
+        plt.figure(figsize=(10, 8))
+        ax = plt.axes()
+        ax.set_title("Normalized Signal", fontsize = 20)
+        ax.set_ylabel("Amplitude", fontsize=18)
+        ax.set_xlabel("Time (sec)", fontsize=18)
+        plt.plot(time, v['ppg'][1:])
+        plt.show()
+
+
 ##readppg data, change the path according to your own directories
-with open('../intermediate_data/all_features_30sec_bfffill_all.json', 'r') as JSON:
+with open('../intermediate_data/ppg_snippets_kaggle.json', 'r') as JSON:
     json_dict = json.load(JSON)
 
 
 
 #scalograms
-T = 30.0 #sec
-Fs=64 #Hz
+T = 30 #sec
+Fs=1000 #Hz
 dt=1/Fs #sec
 time = np.arange(0, T, dt)
 #signal = signal.detrend(json_dict[1]['ppg'], type='constant')
 
 
-wavelet =  "morl" # "morl"# "cmor" "gaus1"
+wavelet =  "cmor3-60" #"cmor3-60" # "morl"# "cmor" "gaus1"
 
 scales = np.arange(1,512,2)
 #print(pywt.scale2frequency(wavelet, scales)/dt) 
 
-plot_wavelet(time, json_dict[266:270], scales, waveletname=wavelet)
+plot_wavelet(time, json_dict[115:116], scales, waveletname=wavelet)
+#plot_signal(time, json_dict[90:95])
 
 
 

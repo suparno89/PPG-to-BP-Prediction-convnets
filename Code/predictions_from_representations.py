@@ -14,13 +14,12 @@ import os
 
 
 
-INPUT_FILE = '../intermediate_data/representations/cardioveg_bfffill_all_scalograms_resnet.pkl'
+INPUT_FILE = '../intermediate_data/representations/cardioveg_biking_spectogram_resnet.pkl'
 LEAVE_N_OUT_VALIDATIONS = 2
-OUTPUT_FILE = '../results/representations/results_cardioveg_leave2out.csv'
+OUTPUT_FILE = '../results/representations/results_cardioveg_leave2out_final.csv'
 IMAGE_REPRESENTATION = 'scalograms'
 MODEL_FOR_REPRESENTATION = 'resnet'
-DATASET = 'cardioveg_bfffill_all'
-
+DATASET = 'cardioveg-fullday'
 
 
 def mean_absolute_percentage_error(y_true, y_pred): 
@@ -161,6 +160,6 @@ if __name__ == "__main__":
     results = run_models(dict_models, df)
     df_results = pd.DataFrame(results)
     print(df_results.head()) 
-    write_file(df_results, OUTPUT_FILE)
+    #write_file(df_results, OUTPUT_FILE)
     #df_results.to_excel('../results/representations/results_cardioveg.xlsx', index = False) 
     #df_results.to_csv(OUTPUT_FILE, index = False, header=True)
